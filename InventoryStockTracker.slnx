@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InventoryStockTracker/InventoryStockTracker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/InventoryStockTracker.Tests/InventoryStockTracker.Tests.csproj" />
+  </Folder>
+</Solution>

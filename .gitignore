@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Client-side libraries restored via LibMan/CDN tooling (not applicable here - Bootstrap/jQuery loaded via CDN)
+# Kept as a safeguard in case LibMan is reintroduced later.
+wwwroot/lib/
