@@ -50,12 +50,18 @@ assumptions were made, and are documented here rather than left implicit:
    *who* performed a movement is called out as a possible future
    improvement rather than attempted here.
 
-6. **SKU is editable only until a product's first stock movement is
-   recorded.** Once at least one `StockMovement` exists for a product, its
-   SKU becomes immutable — enforced both in the UI (field disabled) and
-   independently on the server (not just trusted from the UI state) —
-   because at that point the SKU is functioning as a real business key
-   referenced by transactional history.
+6. **SKU is immutable after creation.** Once a product is created, its SKU
+   can never be changed — there is no edit path for it, either in the UI or
+   the domain model. This is a deliberate simplification over a more
+   granular "lock only after the first movement" rule: that conditional
+   approach is workable, but requires every code path that edits a product
+   to remember to load its movement history before checking whether a
+   change is still allowed — an easy rule to accidentally bypass if that
+   collection isn't loaded. Making SKU permanently immutable removes that
+   failure mode entirely, at the small cost of not being able to fix a
+   typo'd SKU even in the first few seconds of a product's life (the
+   correction path in that case is to deactivate the product and create a
+   new one).
 
 ## What I'd Improve With More Time
 
