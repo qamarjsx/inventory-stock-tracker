@@ -109,4 +109,88 @@ public class ProductsController : Controller
                 .ToList()
         };
     }
+
+    public IActionResult Create()
+    {
+        return View("Edit", new ProductFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ProductFormViewModel form)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("Edit", form);
+        }
+
+        var result = await _productService.CreateAsync(form.Sku, form.Name, form.Description, form.ReorderLevel);
+        if (!result.Success)
+        {
+            ModelState.AddModelError(nameof(ProductFormViewModel.Sku), result.ErrorMessage!);
+            return View("Edit", form);
+        }
+
+        return RedirectToAction(nameof(Details), new { id = result.Product!.Id });
+    }
+
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var product = await _productService.GetByIdAsync(id);
+        if (product is null)
+        {
+            return NotFound();
+        }
+
+        var form = new ProductFormViewModel
+        {
+            Id = product.Id,
+            Sku = product.Sku,
+            Name = product.Name,
+            Description = product.Description,
+            ReorderLevel = product.ReorderLevel
+        };
+
+        return View(form);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, ProductFormViewModel form)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(form);
+        }
+
+        var updated = await _productService.UpdateAsync(id, form.Name, form.Description, form.ReorderLevel);
+        if (!updated)
+        {
+            return NotFound();
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Deactivate(Guid id)
+    {
+        var deactivated = await _productService.DeactivateAsync(id);
+        if (!deactivated) return NotFound();
+
+        TempData["SuccessMessage"] = "Product deactivated.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reactivate(Guid id)
+    {
+        var reactivated = await _productService.ReactivateAsync(id);
+        if (!reactivated) return NotFound();
+
+        TempData["SuccessMessage"] = "Product reactivated.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
 }

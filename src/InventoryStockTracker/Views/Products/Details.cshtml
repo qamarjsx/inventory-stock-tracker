@@ -15,7 +15,22 @@
             }
         </p>
     </div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-app btn-app-secondary">Edit Product</a>
+    <div style="display:flex; gap: var(--space-3);">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-app btn-app-secondary">Edit Product</a>
+        @if (Model.IsActive)
+        {
+            <form asp-action="Deactivate" asp-route-id="@Model.Id" method="post"
+                  onsubmit="return confirm('Deactivate this product? It will be hidden from active use but its history is kept.');">
+                <button type="submit" class="btn-app btn-app-secondary">Deactivate</button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="Reactivate" asp-route-id="@Model.Id" method="post">
+                <button type="submit" class="btn-app btn-app-primary">Reactivate</button>
+            </form>
+        }
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] is string successMessage)
@@ -49,7 +64,8 @@
 
             <div class="form-group">
                 <label asp-for="MovementForm.Type" class="form-label"></label>
-                <select asp-for="MovementForm.Type" asp-items="Html.GetEnumSelectList<StockMovementType>()" class="form-select"></select>
+                <select asp-for="MovementForm.Type" asp-items="Html.GetEnumSelectList<StockMovementType>()"
+                        class="form-select"></select>
                 <span asp-validation-for="MovementForm.Type" class="field-validation"></span>
             </div>
 

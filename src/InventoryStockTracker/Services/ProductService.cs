@@ -1,5 +1,6 @@
 using InventoryStockTracker.Data;
 using InventoryStockTracker.Entities;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryStockTracker.Services;
@@ -55,7 +56,7 @@ public class ProductService : IProductService
         {
             await _context.SaveChangesAsync();
         }
-        catch (DbUpdateException) 
+        catch (DbUpdateException)
         {
             // Defense in depth: the AnyAsync check above closes almost every
             // window, but two requests submitting the same new SKU at nearly
@@ -80,17 +81,23 @@ public class ProductService : IProductService
         return true;
     }
 
-    public async Task DeactivateAsync(Guid id)
+    public async Task<bool> DeactivateAsync(Guid id)
     {
         var product = await _context.Products.FindAsync(id);
-        product?.Deactivate();
-        if (product is not null) await _context.SaveChangesAsync();
+        if (product is null) return false;
+
+        product.Deactivate();
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public async Task ReactivateAsync(Guid id)
+    public async Task<bool> ReactivateAsync(Guid id)
     {
         var product = await _context.Products.FindAsync(id);
-        product?.Reactivate();
-        if (product is not null) await _context.SaveChangesAsync();
+        if (product is null) return false;
+
+        product.Reactivate();
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

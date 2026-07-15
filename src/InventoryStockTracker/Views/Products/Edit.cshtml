@@ -1,0 +1,71 @@
+@model InventoryStockTracker.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? $"Edit {Model.Name}" : "Add Product";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">@(Model.IsEditMode ? "Edit Product" : "Add Product")</h1>
+        <p class="page-subtitle">
+            @(Model.IsEditMode ? "Update product details" : "Create a new product in your catalog")
+        </p>
+    </div>
+</div>
+
+<div class="detail-card" style="max-width: 480px;">
+    <form asp-action="@(Model.IsEditMode ? "Edit" : "Create")"
+          asp-route-id="@Model.Id"
+          method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        @if (Model.IsEditMode)
+        {
+            <div class="form-group">
+                <label class="form-label">SKU</label>
+                <input value="@Model.Sku" class="form-input" disabled />
+                <span class="field-validation" style="color: var(--color-text-muted);">
+                    SKU cannot be changed after a product is created.
+                </span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label asp-for="Sku" class="form-label"></label>
+                <input asp-for="Sku" class="form-input" autofocus />
+                <span asp-validation-for="Sku" class="field-validation"></span>
+            </div>
+        }
+
+        <div class="form-group">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-input" />
+            <span asp-validation-for="Name" class="field-validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-input" rows="3"></textarea>
+            <span asp-validation-for="Description" class="field-validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ReorderLevel" class="form-label"></label>
+            <input asp-for="ReorderLevel" class="form-input" />
+            <span asp-validation-for="ReorderLevel" class="field-validation"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-app btn-app-primary">
+                @(Model.IsEditMode ? "Save Changes" : "Add Product")
+            </button>
+            <a asp-action="@(Model.IsEditMode ? "Details" : "Index")" asp-route-id="@Model.Id" class="btn-app btn-app-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

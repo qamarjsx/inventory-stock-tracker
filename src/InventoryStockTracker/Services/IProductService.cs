@@ -8,8 +8,8 @@ public interface IProductService
     Task<Product?> GetByIdAsync(Guid id);
     Task<ProductCreateResult> CreateAsync(string sku, string name, string? description, int reorderLevel);
     Task<bool> UpdateAsync(Guid id, string name, string? description, int reorderLevel);
-    Task DeactivateAsync(Guid id);
-    Task ReactivateAsync(Guid id);
+    Task<bool> DeactivateAsync(Guid id);
+    Task<bool> ReactivateAsync(Guid id);
 }
 
 public record ProductCreateResult(bool Success, string? ErrorMessage, Product? Product = null);
