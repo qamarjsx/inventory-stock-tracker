@@ -1,0 +1,82 @@
+@model InventoryStockTracker.ViewModels.ProductListViewModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Products</h1>
+        <p class="page-subtitle">Manage your catalog and stock levels</p>
+    </div>
+    <a asp-action="Create" class="btn-app btn-app-primary">+ Add Product</a>
+</div>
+
+<form method="get" asp-action="Index">
+    <div class="search-input-wrapper">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" name="search" value="@Model.SearchTerm"
+               class="search-input" placeholder="Search SKU or name..."
+               onchange="this.form.submit()" />
+    </div>
+</form>
+
+@if (!Model.Products.Any())
+{
+    <div class="empty-state">
+        <div class="empty-state-title">
+            @(string.IsNullOrWhiteSpace(Model.SearchTerm) ? "No products yet" : "No matching products")
+        </div>
+        <p>
+            @(string.IsNullOrWhiteSpace(Model.SearchTerm)
+                ? "Get started by adding your first product."
+                : $"Nothing matches \"{Model.SearchTerm}\". Try a different search.")
+        </p>
+    </div>
+}
+else
+{
+    <div class="data-table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Stock</th>
+                    <th>Reorder Level</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model.Products)
+                {
+                    <tr>
+                        <td class="cell-secondary">@product.Sku</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@product.Id" class="cell-link">
+                                @product.Name
+                            </a>
+                        </td>
+                        <td>@product.CurrentStock</td>
+                        <td class="cell-secondary">@product.ReorderLevel</td>
+                        <td>
+                            @if (!product.IsActive)
+                            {
+                                <span class="badge-app badge-muted">Inactive</span>
+                            }
+                            else if (product.IsLowStock)
+                            {
+                                <span class="badge-app badge-danger">Low stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge-app badge-success">In stock</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
