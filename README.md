@@ -1,7 +1,7 @@
 # Inventory & Stock Movements Tracker
 
 A small ASP.NET Core MVC module for tracking products and their stock
-levels, built for the DevExcel take-home assignment. Current stock is never
+levels. Current stock is never
 stored or edited directly — it is always computed from an append-only log
 of stock movements (`In` / `Out`), which is the core design constraint the
 rest of the app is built around.
