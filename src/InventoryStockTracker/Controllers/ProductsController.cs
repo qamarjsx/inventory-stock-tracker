@@ -74,7 +74,9 @@ public class ProductsController : Controller
 
         if (!result.Success)
         {
-            ModelState.AddModelError(nameof(RecordMovementInputViewModel.Quantity), result.ErrorMessage!);
+            ModelState.AddModelError(
+            $"{nameof(ProductDetailViewModel.MovementForm)}.{nameof(RecordMovementInputViewModel.Quantity)}",
+            result.ErrorMessage!);
             var viewModel = await BuildDetailViewModelAsync(product);
             viewModel.MovementForm = movementForm;
             return View("Details", viewModel);
