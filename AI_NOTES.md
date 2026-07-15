@@ -1,32 +1,43 @@
 # AI Usage Notes
 
-This project was built with AI assistance (Claude), used as a mentor/pair
-for architecture decisions, code review, and explanations — not as a
-one-shot code generator. This document tracks how it was used and is
-updated as the project progresses.
+## Tools used
 
-## Tools Used
+Claude (claude.ai) was used throughout this project, in a mentoring/
+pair-programming mode rather than a code-generation mode — I designed and
+wrote the domain model, service layer, controllers, and views myself, and
+used Claude to:
 
-- Claude (Anthropic) — architecture discussion, design review, code review,
-  explanations of .NET/EF Core concepts, pair-programming style guidance.
+- Talk through architecture and technology tradeoffs before committing to
+  them (MVC vs. Razor Pages vs. Blazor; EF Core vs. Dapper; SQLite vs.
+  LocalDB; the concurrency strategy for the zero-floor stock rule)
+- Review my code PR-style before each commit (spotting a missing namespace
+  on `StockMovementType`, a mismatched README/entities commit, an
+  auto-generated NuGet vulnerability warning caught by
+  `TreatWarningsAsErrors`)
+- Explain unfamiliar EF Core/C# mechanics in depth once I asked for it —
+  transactions and isolation levels, `await using` disposal semantics,
+  SQLite's file-level locking vs. row-level locking, tag helpers
+- Help scaffold the CSS design system and Razor view markup, which I then
+  reviewed and adjusted
+- Write the two unit tests covering the stock calculation and the
+  zero-floor rejection rule
 
-## What AI Was Used For
+## Something the AI got wrong that I had to catch and correct
 
-_TODO — updated as work progresses. Expected categories:_
-- Scaffolding/project structure decisions
-- Design discussion (architecture, concurrency handling, validation strategy)
-- Code review (PR-style feedback on implementation)
-- Explaining .NET/EF Core concepts
-- Unit test structure
-
-## What AI Was NOT Used For
-
-- AI was explicitly instructed not to generate the implementation directly.
-  Code was written by me; AI was used to explain concepts, review my code,
-  and challenge my design decisions before and after implementation.
-
-## A Mistake AI Made That I Caught
-
-_TODO — to be filled in with a concrete example once one occurs. This
-section will not be fabricated; it will reflect an actual instance during
-development._
+While explaining `StockService.RecordMovementAsync`, Claude initially
+justified duplicating the current-stock summing query directly inside
+`RecordMovementAsync` — instead of calling the existing
+`GetCurrentStockAsync` method — by claiming it was necessary for the
+re-check to run inside the open transaction. I pushed back and asked why
+we couldn't just call `GetCurrentStockAsync` from inside the same method,
+since it's on the same service. Claude then acknowledged the reasoning
+didn't actually hold: `RecordMovementAsync` and `GetCurrentStockAsync` are
+both methods on the same `StockService` instance, sharing the same
+`AppDbContext` field — so a query issued via `GetCurrentStockAsync` from
+inside `RecordMovementAsync`, after `BeginTransactionAsync()` has run, still
+participates in that same open transaction. The "must duplicate the query"
+justification was wrong; the duplication was an unnecessary simplification
+that should have been refactored to call the existing method instead. This
+was a useful reminder to actually question the reasoning behind AI-provided
+explanations rather than accept them because the code itself compiled and
+worked.
