@@ -484,3 +484,8 @@ $RECYCLE.BIN/
 # Client-side libraries restored via LibMan/CDN tooling (not applicable here - Bootstrap/jQuery loaded via CDN)
 # Kept as a safeguard in case LibMan is reintroduced later.
 wwwroot/lib/
+
+# SQLite database file - generated at runtime via migrations, not committed
+*.db
+*.db-shm
+*.db-wal
